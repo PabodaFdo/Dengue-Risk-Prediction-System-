@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Sri Lanka Dengue Intelligence Dashboard – AI-powered dengue risk analysis using district-level case data and weather-based features." />
+  <meta name="keywords" content="Dengue, Sri Lanka, Public Health, Machine Learning, Risk Prediction, Weather, District" />
+  <meta name="author" content="Dengue Risk Prediction Research Group" />
+  <meta property="og:title" content="Sri Lanka Dengue Intelligence Dashboard" />
+  <meta property="og:description" content="AI-powered dengue risk analysis using Sri Lankan district and weather data." />
+  <meta property="og:type" content="website" />
+  <title>Sri Lanka Dengue Intelligence Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="16" cy="16" r="14" fill="url(#grad1)" />
+          <path d="M10 22 Q16 8 22 22" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <circle cx="16" cy="14" r="3" fill="white" opacity="0.9"/>
+          <defs>
+            <linearGradient id="grad1" x1="0" y1="0" x2="32" y2="32">
+              <stop offset="0%" stop-color="#0ea5e9"/>
+              <stop offset="100%" stop-color="#10b981"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">DengueWatch</span>
+        <span class="brand-sub">Sri Lanka Intelligence</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <a href="#overview" class="nav-item active" data-section="overview" id="nav-overview">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Overview</span>
+      </a>
+      <a href="#districts" class="nav-item" data-section="districts" id="nav-districts">
+        <span class="nav-icon">🗺️</span>
+        <span class="nav-label">District Risk Map</span>
+      </a>
+      <a href="#simulator" class="nav-item" data-section="simulator" id="nav-simulator">
+        <span class="nav-icon">🔬</span>
+        <span class="nav-label">Risk Simulator</span>
+      </a>
+      <a href="#pipeline" class="nav-item" data-section="pipeline" id="nav-pipeline">
+        <span class="nav-icon">⚙️</span>
+        <span class="nav-label">ML Pipeline</span>
+      </a>
+      <a href="#eda" class="nav-item" data-section="eda" id="nav-eda">
+        <span class="nav-icon">📈</span>
+        <span class="nav-label">EDA Insights</span>
+      </a>
+      <a href="#model" class="nav-item" data-section="model" id="nav-model">
+        <span class="nav-icon">🤖</span>
+        <span class="nav-label">Model Info</span>
+      </a>
+      <a href="#prevention" class="nav-item" data-section="prevention" id="nav-prevention">
+        <span class="nav-icon">🛡️</span>
+        <span class="nav-label">Prevention</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-disclaimer">
+        <span class="disclaimer-dot"></span>
+        <span>Academic ML Project</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===================== MOBILE TOPBAR ===================== -->
+  <div class="mobile-topbar">
+    <button class="hamburger" id="hamburger-btn" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+    <span class="mobile-brand">DengueWatch SL</span>
+    <div class="mobile-status">
+      <span class="status-dot pulse"></span>
+      <span>Live</span>
+    </div>
+  </div>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <main class="main-content" id="main-content">
+
+    <!-- ===================== HEADER BANNER ===================== -->
+    <header class="page-header" id="overview">
+      <div class="header-content">
+        <div class="header-badges">
+          <span class="hbadge hbadge-teal">
+            <span class="pulse-dot"></span> Sri Lanka National Surveillance
+          </span>
+          <span class="hbadge hbadge-blue">2022 – 2025 Data</span>
+          <span class="hbadge hbadge-green">25 Districts Covered</span>
+        </div>
+        <h1 class="page-title">
+          Dengue Risk <span class="title-accent">Prediction System</span>
+        </h1>
+        <p class="page-subtitle">
+          AI-powered dengue risk analysis using Sri Lankan district-level case data and weather-based features.
+          Integrating clinical reports from the National Dengue Control Unit with meteorological data from Open-Meteo API.
+        </p>
+        <div class="header-disclaimer">
+          <span class="disclaimer-icon">⚠️</span>
+          <span>This is an academic ML project and not an official health warning system. Predictions are for research and educational purposes only.</span>
+        </div>
+        <div class="header-actions">
+          <a href="#simulator" class="btn btn-primary" id="btn-go-simulator">
+            <span>🔬 Launch Risk Simulator</span>
+          </a>
+          <a href="#pipeline" class="btn btn-outline" id="btn-go-pipeline">
+            <span>⚙️ Explore ML Pipeline</span>
+          </a>
+        </div>
+      </div>
+      <!-- Risk Intelligence Panel -->
+      <div class="risk-intel-panel">
+        <div class="rip-header">
+          <span class="rip-icon">🦟</span>
+          <span class="rip-title">Dengue Risk Intelligence</span>
+          <span class="rip-live-dot"></span>
+        </div>
+
+        <!-- Large risk score -->
+        <div class="rip-score-block">
+          <div class="rip-score-number">78<span class="rip-pct">%</span></div>
+          <div class="rip-score-label">Demo Risk Signal</div>
+        </div>
+
+        <!-- Risk level colour bar -->
+        <div class="rip-level-bar-wrap">
+          <div class="rip-level-bar">
+            <div class="rip-bar-seg rip-low"></div>
+            <div class="rip-bar-seg rip-med"></div>
+            <div class="rip-bar-seg rip-high rip-active-seg"></div>
+          </div>
+          <div class="rip-level-labels">
+            <span>Low</span>
+            <span>Medium</span>
+            <span class="rip-label-active">High ◀</span>
+          </div>
+        </div>
+
+        <!-- 2×2 metric grid -->
+        <div class="rip-metrics">
+          <div class="rip-metric">
+            <span class="rip-metric-icon">📋</span>
+            <span class="rip-metric-val">4,367</span>
+            <span class="rip-metric-label">Data Rows</span>
+          </div>
+          <div class="rip-metric">
+            <span class="rip-metric-icon">🗺️</span>
+            <span class="rip-metric-val">25</span>
+            <span class="rip-metric-label">Districts</span>
+          </div>
+          <div class="rip-metric">
+            <span class="rip-metric-icon">📅</span>
+            <span class="rip-metric-val">2022–25</span>
+            <span class="rip-metric-label">Dataset Period</span>
+          </div>
+          <div class="rip-metric">
+            <span class="rip-metric-icon">🌡️</span>
+            <span class="rip-metric-val">6</span>
+            <span class="rip-metric-label">Weather Features</span>
+          </div>
+        </div>
+
+        <!-- Disclaimer note -->
+        <div class="rip-note">
+          ⚡ Demo dashboard view. Final prediction comes from the trained ML model / notebook.
+        </div>
+      </div>
+    </header>
+
+    <!-- ===================== ANALYTICS CARDS ===================== -->
+    <section class="section" id="analytics-cards">
+      <div class="analytics-grid">
+        <div class="acard acard-teal">
+          <div class="acard-icon">🗺️</div>
+          <div class="acard-info">
+            <div class="acard-value">25</div>
+            <div class="acard-label">Districts Covered</div>
+          </div>
+          <div class="acard-trend">All of Sri Lanka</div>
+        </div>
+        <div class="acard acard-blue">
+          <div class="acard-icon">📅</div>
+          <div class="acard-info">
+            <div class="acard-value">2022–25</div>
+            <div class="acard-label">Data Period</div>
+          </div>
+          <div class="acard-trend">Weekly Granularity</div>
+        </div>
+        <div class="acard acard-green">
+          <div class="acard-icon">📋</div>
+          <div class="acard-info">
+            <div class="acard-value">4,367</div>
+            <div class="acard-label">Tabular Records</div>
+          </div>
+          <div class="acard-trend">Cleaned & Processed</div>
+        </div>
+        <div class="acard acard-yellow">
+          <div class="acard-icon">🌡️</div>
+          <div class="acard-info">
+            <div class="acard-value">6+</div>
+            <div class="acard-label">Weather Features</div>
+          </div>
+          <div class="acard-trend">Temp · Rain · Wind</div>
+        </div>
+        <div class="acard acard-red">
+          <div class="acard-icon">🤖</div>
+          <div class="acard-info">
+            <div class="acard-value">3-Class</div>
+            <div class="acard-label">ML Risk Output</div>
+          </div>
+          <div class="acard-trend">Low · Medium · High</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== DISTRICT RISK PANEL ===================== -->
+    <section class="section" id="districts">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">District Risk Overview</h2>
+          <p class="section-subtitle">Sri Lanka district-level dengue risk assessment. Click a card for details.</p>
+        </div>
+        <div class="district-controls">
+          <input type="text" class="district-search" id="district-search" placeholder="🔍 Search district..." />
+          <select class="district-filter" id="district-filter">
+            <option value="all">All Risk Levels</option>
+            <option value="high">High Risk</option>
+            <option value="medium">Medium Risk</option>
+            <option value="low">Low Risk</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="district-grid" id="district-grid">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- ===================== RISK SIMULATOR ===================== -->
+    <section class="section" id="simulator">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">🔬 Dengue Risk Simulator</h2>
+          <p class="section-subtitle">Select a district and enter weather parameters to predict dengue risk.</p>
+        </div>
+        <div class="sim-disclaimer">
+          <span>⚡ Demo uses rule-based JS logic. Real ML model is in the trained notebook.</span>
+        </div>
+      </div>
+
+      <div class="simulator-layout">
+        <!-- Controls Panel -->
+        <div class="sim-controls-panel">
+          <div class="sim-section-label">📍 Location & Climate Inputs</div>
+
+          <div class="form-group">
+            <label class="form-label" for="sim-district">District</label>
+            <select class="form-select" id="sim-district">
+              <option value="Colombo" data-base="0.78">Colombo</option>
+              <option value="Gampaha" data-base="0.65">Gampaha</option>
+              <option value="Kalutara" data-base="0.52">Kalutara</option>
+              <option value="Kandy" data-base="0.48">Kandy</option>
+              <option value="Kurunegala" data-base="0.44">Kurunegala</option>
+              <option value="Galle" data-base="0.38">Galle</option>
+              <option value="Jaffna" data-base="0.35">Jaffna</option>
+              <option value="Batticaloa" data-base="0.40">Batticaloa</option>
+              <option value="Matara" data-base="0.36">Matara</option>
+              <option value="Ratnapura" data-base="0.42">Ratnapura</option>
+              <option value="Anuradhapura" data-base="0.31">Anuradhapura</option>
+              <option value="Monaragala" data-base="0.22">Monaragala</option>
+              <option value="Hambantota" data-base="0.28">Hambantota</option>
+              <option value="Polonnaruwa" data-base="0.30">Polonnaruwa</option>
+              <option value="Badulla" data-base="0.27">Badulla</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <div class="slider-header">
+              <label class="form-label" for="sim-rain">Weekly Rainfall</label>
+              <span class="slider-value" id="sim-rain-val">45 mm</span>
+            </div>
+            <input type="range" class="slider" id="sim-rain" min="0" max="200" step="1" value="45" />
+            <div class="slider-ticks">
+              <span>0 mm</span><span>100 mm</span><span>200 mm</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="slider-header">
+              <label class="form-label" for="sim-temp">Avg. Temperature</label>
+              <span class="slider-value" id="sim-temp-val">27.5 °C</span>
+            </div>
+            <input type="range" class="slider" id="sim-temp" min="18" max="36" step="0.5" value="27.5" />
+            <div class="slider-ticks">
+              <span>18 °C</span><span>27 °C</span><span>36 °C</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="slider-header">
+              <label class="form-label" for="sim-sunshine">Daily Sunshine Hours</label>
+              <span class="slider-value" id="sim-sunshine-val">7.2 hrs</span>
+            </div>
+            <input type="range" class="slider" id="sim-sunshine" min="0" max="12" step="0.1" value="7.2" />
+            <div class="slider-ticks">
+              <span>0 hrs</span><span>6 hrs</span><span>12 hrs</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="slider-header">
+              <label class="form-label" for="sim-wind">Wind Speed</label>
+              <span class="slider-value" id="sim-wind-val">12 km/h</span>
+            </div>
+            <input type="range" class="slider" id="sim-wind" min="0" max="50" step="1" value="12" />
+            <div class="slider-ticks">
+              <span>0</span><span>25 km/h</span><span>50 km/h</span>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-full" id="predict-btn">
+            <span>🔮 Predict Risk</span>
+          </button>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="sim-results-panel" id="sim-results-panel">
+          <div class="result-header">
+            <span class="result-section-label">Prediction Output</span>
+          </div>
+
+          <!-- Gauge -->
+          <div class="gauge-wrapper">
+            <svg class="gauge-svg" viewBox="0 0 200 120" xmlns="http://www.w3.org/2000/svg">
+              <!-- background arc -->
+              <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#e2e8f0" stroke-width="14" stroke-linecap="round"/>
+              <!-- foreground arc -->
+              <path class="gauge-arc" id="gauge-arc" d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="#10b981" stroke-width="14" stroke-linecap="round" stroke-dasharray="251.2" stroke-dashoffset="251.2"/>
+              <!-- needle -->
+              <line id="gauge-needle" x1="100" y1="100" x2="100" y2="28" stroke="#334155" stroke-width="3" stroke-linecap="round" transform="rotate(-90, 100, 100)"/>
+              <circle cx="100" cy="100" r="6" fill="#334155"/>
+            </svg>
+            <div class="gauge-labels">
+              <span class="gauge-low">LOW</span>
+              <span class="gauge-high">HIGH</span>
+            </div>
+            <div class="gauge-center-val" id="gauge-pct">--</div>
+          </div>
+
+          <div class="risk-badge-large" id="risk-badge-large">
+            <span id="risk-badge-text">Run Simulation</span>
+          </div>
+
+          <div class="confidence-bar-wrapper">
+            <div class="confidence-label">
+              <span>Confidence Level</span>
+              <span id="confidence-pct">--%</span>
+            </div>
+            <div class="confidence-bar-bg">
+              <div class="confidence-bar-fill" id="confidence-bar"></div>
+            </div>
+          </div>
+
+          <div class="result-explanation" id="result-explanation">
+            <p>Adjust the weather parameters and click <strong>Predict Risk</strong> to see the dengue risk assessment for the selected district.</p>
+          </div>
+
+          <div class="result-factors" id="result-factors" style="display:none;">
+            <div class="factor-item" id="factor-rain">
+              <span class="factor-icon">🌧️</span>
+              <span class="factor-label">Rainfall</span>
+              <div class="factor-bar-bg"><div class="factor-bar" id="fb-rain"></div></div>
+            </div>
+            <div class="factor-item" id="factor-temp">
+              <span class="factor-icon">🌡️</span>
+              <span class="factor-label">Temperature</span>
+              <div class="factor-bar-bg"><div class="factor-bar" id="fb-temp"></div></div>
+            </div>
+            <div class="factor-item" id="factor-sun">
+              <span class="factor-icon">☀️</span>
+              <span class="factor-label">Sunshine</span>
+              <div class="factor-bar-bg"><div class="factor-bar" id="fb-sun"></div></div>
+            </div>
+          </div>
+
+          <div class="result-note">
+            ⚡ Predictions use client-side rule-based logic. Real ML model results available in the trained notebook.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ML PIPELINE ===================== -->
+    <section class="section" id="pipeline">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">⚙️ ML Pipeline</h2>
+          <p class="section-subtitle">Click any step to learn more about the preprocessing and modeling workflow.</p>
+        </div>
+      </div>
+
+      <div class="pipeline-container">
+        <div class="pipeline-steps" id="pipeline-steps">
+          <!-- Steps populated by JS -->
+        </div>
+        <div class="pipeline-detail-panel" id="pipeline-detail">
+          <div class="pipeline-detail-placeholder">
+            <div class="placeholder-icon">⚙️</div>
+            <p>Click any pipeline step to view details about that stage.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== EDA INSIGHTS ===================== -->
+    <section class="section" id="eda">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">📈 EDA Insights</h2>
+          <p class="section-subtitle">Exploratory Data Analysis results. Click any card to view the chart and explanation.</p>
+        </div>
+      </div>
+
+      <div class="eda-grid" id="eda-grid">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- ===================== MODEL INFO ===================== -->
+    <section class="section" id="model">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">🤖 Model Explanation</h2>
+          <p class="section-subtitle">Understanding the machine learning approach behind the predictions.</p>
+        </div>
+      </div>
+
+      <div class="model-grid">
+        <div class="model-card">
+          <div class="model-card-icon">🎯</div>
+          <h3 class="model-card-title">Target Variable</h3>
+          <p class="model-card-desc">Dengue risk level classified as <strong>Low</strong>, <strong>Medium</strong>, or <strong>High</strong>. High risk is defined as weekly cases ≥ 75th percentile of historical baseline for that district.</p>
+        </div>
+        <div class="model-card">
+          <div class="model-card-icon">📐</div>
+          <h3 class="model-card-title">Input Features</h3>
+          <p class="model-card-desc">District identifier (encoded), weekly case history, mean/max/min temperature, precipitation sum, sunshine duration, daylight duration, wind speed, and evapotranspiration index.</p>
+        </div>
+        <div class="model-card">
+          <div class="model-card-icon">🔧</div>
+          <h3 class="model-card-title">Feature Engineering</h3>
+          <p class="model-card-desc">Lag features (2–4 weeks) for temperature and rainfall to capture mosquito breeding cycle delays. Daylight-to-sunshine ratios and district-specific rolling averages.</p>
+        </div>
+        <div class="model-card">
+          <div class="model-card-icon">📏</div>
+          <h3 class="model-card-title">Why Scaling?</h3>
+          <p class="model-card-desc">StandardScaler (Z-score) normalizes all numerical features to mean=0, std=1. This prevents large-magnitude features (e.g. rainfall in mm) from dominating distance-based algorithms and PCA.</p>
+        </div>
+        <div class="model-card">
+          <div class="model-card-icon">🧬</div>
+          <h3 class="model-card-title">PCA Reduction</h3>
+          <p class="model-card-desc">Principal Component Analysis extracts 7 principal components that capture >90% of variance from the weather feature set, resolving multicollinearity and reducing overfitting risk.</p>
+        </div>
+        <div class="model-card">
+          <div class="model-card-icon">🏷️</div>
+          <h3 class="model-card-title">District Encoding</h3>
+          <p class="model-card-desc">Target encoding maps each district to its mean historical risk score, converting categorical district names to continuous numerical values without high-cardinality one-hot explosion.</p>
+        </div>
+      </div>
+
+      <div class="model-flow">
+        <div class="mflow-item">
+          <div class="mflow-icon">📄</div>
+          <span>Raw Data</span>
+        </div>
+        <div class="mflow-arrow">→</div>
+        <div class="mflow-item">
+          <div class="mflow-icon">🔧</div>
+          <span>Engineer</span>
+        </div>
+        <div class="mflow-arrow">→</div>
+        <div class="mflow-item">
+          <div class="mflow-icon">📏</div>
+          <span>Scale</span>
+        </div>
+        <div class="mflow-arrow">→</div>
+        <div class="mflow-item">
+          <div class="mflow-icon">🧬</div>
+          <span>PCA</span>
+        </div>
+        <div class="mflow-arrow">→</div>
+        <div class="mflow-item mflow-highlight">
+          <div class="mflow-icon">🤖</div>
+          <span>Predict</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PREVENTION ===================== -->
+    <section class="section" id="prevention">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">🛡️ Prevention Recommendations</h2>
+          <p class="section-subtitle">Recommendations update based on your simulator prediction. Run the simulator first for personalized advice.</p>
+        </div>
+        <div class="current-risk-indicator" id="current-risk-indicator">
+          <span class="cri-label">Current Risk Level:</span>
+          <span class="cri-badge" id="cri-badge">Not simulated</span>
+        </div>
+      </div>
+
+      <div class="prevention-tabs">
+        <button class="prev-tab active" data-level="low" id="ptab-low">🟢 Low Risk</button>
+        <button class="prev-tab" data-level="medium" id="ptab-medium">🟡 Medium Risk</button>
+        <button class="prev-tab" data-level="high" id="ptab-high">🔴 High Risk</button>
+      </div>
+
+      <div class="prevention-panels">
+        <div class="prev-panel active" id="panel-low">
+          <div class="prev-panel-header low">
+            <span class="prev-panel-icon">✅</span>
+            <div>
+              <h3>Low Risk — Maintain Vigilance</h3>
+              <p>Risk is currently low. Continue routine practices to keep it that way.</p>
+            </div>
+          </div>
+          <div class="prev-actions">
+            <div class="prev-action">
+              <div class="prev-action-icon">🧹</div>
+              <div class="prev-action-content">
+                <h4>Regular Cleaning</h4>
+                <p>Continue regular cleaning of surroundings. Remove fallen leaves and debris that can trap water.</p>
+              </div>
+            </div>
+            <div class="prev-action">
+              <div class="prev-action-icon">🪣</div>
+              <div class="prev-action-content">
+                <h4>Monitor Water Containers</h4>
+                <p>Check water storage containers weekly. Ensure they are tightly covered to prevent mosquito breeding.</p>
+              </div>
+            </div>
+            <div class="prev-action">
+              <div class="prev-action-icon">📋</div>
+              <div class="prev-action-content">
+                <h4>Stay Informed</h4>
+                <p>Monitor local health alerts. Track weekly case counts in your district for early warning.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prev-panel" id="panel-medium">
+          <div class="prev-panel-header medium">
+            <span class="prev-panel-icon">⚠️</span>
+            <div>
+              <h3>Medium Risk — Take Preventive Action</h3>
+              <p>Elevated risk detected. Take targeted precautions to minimize mosquito breeding opportunities.</p>
+            </div>
+          </div>
+          <div class="prev-actions">
+            <div class="prev-action">
+              <div class="prev-action-icon">💧</div>
+              <div class="prev-action-content">
+                <h4>Remove Stagnant Water</h4>
+                <p>Eliminate all sources of standing water — flower pots, tyres, gutters, and roof drainage channels.</p>
+              </div>
+            </div>
+            <div class="prev-action">
+              <div class="prev-action-icon">🌿</div>
+              <div class="prev-action-content">
+                <h4>Inspect Gardens & Drains</h4>
+                <p>Check gardens, drains, and low-lying areas after rainfall. Clear blockages that cause water pooling.</p>
+              </div>
+            </div>
+            <div class="prev-action">
+              <div class="prev-action-icon">🦟</div>
+              <div class="prev-action-content">
+                <h4>Use Mosquito Protection</h4>
+                <p>Apply mosquito repellent, use mosquito nets, and wear long-sleeved clothing especially during dawn and dusk.</p>
+              </div>
+            </div>
+            <div class="prev-action">
+              <div class="prev-action-icon">🏘️</div>
+              <div class="prev-action-content">
+                <h4>Community Awareness</h4>
+                <p>Notify neighbors and participate in community clean-up activities to reduce collective breeding sites.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="prev-panel" id="panel-high">
+          <div class="prev-panel-header high">
+            <span class="prev-panel-icon">🚨</span>
+            <div>
+              <h3>High Risk — Urgent Action Required</h3>
+              <p>Critical dengue risk level. Immediate and coordinated action is essential.</p>
+            </div>
+          </div>
+          <div class="prev-actions">
+            <div class="prev-action">
+              <div class="prev-action-icon">📢</div>
+              <div class="prev-action-content">
+                <h4>Increase Community Awareness</h4>
+                <p>Coordinate with local health authorities and community leaders to escalate awareness campaigns immediately.</p>
+              </div>
+            </div>
+            <div class="prev-action">
+              <div class="prev-action-icon">🔍</div>
+              <div class="prev-action-content">
+                <h4>Inspect All Breeding Places</h4>
+                <p>Conduct systematic inspection of all potential breeding sites. Report large breeding grounds to local health officers.</p>
+              </div>
+            </div>
+            <div class="prev-action">
+              <div class="prev-action-icon">🏥</div>
+              <div class="prev-action-content">
+                <h4>Seek Medical Help Promptly</h4>
+                <p>If dengue symptoms appear (high fever, severe headache, rash, joint pain), seek medical attention immediately without delay.</p>
+              </div>
+            </div>
+            <div class="prev-action">
+              <div class="prev-action-icon">🏛️</div>
+              <div class="prev-action-content">
+                <h4>Follow Public Health Guidelines</h4>
+                <p>Follow all instructions from the Ministry of Health and National Dengue Control Unit. Cooperate with fogging operations.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="dashboard-footer">
+      <div class="footer-inner">
+        <div class="footer-brand">
+          <div class="footer-logo">DW</div>
+          <div>
+            <div class="footer-name">Dengue Risk Prediction System</div>
+            <div class="footer-tagline">Sri Lanka Dengue Intelligence</div>
+          </div>
+        </div>
+        <div class="footer-info">
+          <p>Academic ML Project · Built for dengue awareness and data-driven risk analysis.</p>
+          <p>Data source: National Dengue Control Unit (Ministry of Health, Sri Lanka) &amp; Open-Meteo API.</p>
+        </div>
+        <div class="footer-copy">
+          &copy; 2026 Dengue Risk Prediction Research Group. All Rights Reserved.
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- ===================== EDA MODAL ===================== -->
+  <div class="modal-overlay" id="eda-modal" role="dialog" aria-modal="true">
+    <div class="modal-box" id="eda-modal-box">
+      <button class="modal-close-btn" id="eda-modal-close" aria-label="Close modal">&times;</button>
+      <div class="modal-img-panel">
+        <img id="modal-img" src="" alt="EDA Chart" />
+      </div>
+      <div class="modal-text-panel">
+        <span class="modal-tag" id="modal-tag">Analysis</span>
+        <h3 class="modal-title" id="modal-title">Chart Title</h3>
+        <p class="modal-body" id="modal-body">Chart explanation goes here.</p>
+        <div class="modal-insights" id="modal-insights"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== DISTRICT DETAIL MODAL ===================== -->
+  <div class="modal-overlay" id="district-modal" role="dialog" aria-modal="true">
+    <div class="modal-box modal-box-sm" id="district-modal-box">
+      <button class="modal-close-btn" id="district-modal-close" aria-label="Close">&times;</button>
+      <div class="dmodal-header" id="dmodal-header">
+        <span class="dmodal-district" id="dmodal-name">Colombo</span>
+        <span class="dmodal-risk-badge" id="dmodal-risk">High Risk</span>
+      </div>
+      <div class="dmodal-body" id="dmodal-body">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
